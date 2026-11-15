@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <!-- Native Mobile App Meta Tags (iOS & Android Home Screen Ready) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="LifeForge" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#E11D48" />
+  <title>LifeForge: Unlimited</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Inline Dynamic Manifest for PWA Installability -->
+  <link rel="manifest" id="pwa-manifest" />
+
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #E2E8F0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100dvh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Mobile App Shell */
+    #app-shell {
+      width: 100%;
+      max-width: 480px;
+      height: 100dvh;
+      background-color: #F4F6F9;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+    }
+
+    /* Custom Scrollbar for Journal */
+    .journal-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .journal-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .journal-scroll::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+
+    /* Smooth Progress Bars */
+    .stat-fill {
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
+    }
+
+    /* Button Tactile Press */
+    .btn-press {
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+    .btn-press:active {
+      transform: scale(0.93);
+      filter: brightness(0.95);
+    }
+
+    /* Age Button Pulse Glow */
+    @keyframes subtlePulse {
+      0%, 100% { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45); }
+      50% { box-shadow: 0 8px 26px rgba(16, 185, 129, 0.7); }
+    }
+    .age-btn-glow {
+      animation: subtlePulse 2.6s infinite ease-in-out;
+    }
+
+    /* Modal Slide Up Animation */
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0.4; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-sheet {
+      animation: slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Pop-in Card Animation */
+    @keyframes popIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .pop-card {
+      animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .safe-top-pad {
+      padding-top: max(12px, var(--safe-top));
+    }
+    .safe-bottom-pad {
+      padding-bottom: max(12px, var(--safe-bottom));
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-shell">
+  <!-- TOP MOBILE APP HEADER -->
+  <header class="bg-gradient-to-r from-rose-600 via-red-600 to-rose-700 text-white px-4 pb-3 safe-top-pad shadow-md z-20 shrink-0">
+    <div class="flex items-center justify-between gap-2">
+      <!-- Avatar & Name -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <button onclick="openGodModeModal()" class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-2xl shadow-inner shrink-0 btn-press" id="header-avatar" title="Tap to customize">
+          👶
+        </button>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <h1 id="header-name" class="font-extrabold text-base tracking-tight truncate">Alex Mercer</h1>
+            <span id="header-flag" class="text-sm shrink-0">🇺🇸</span>
+          </div>
+          <div class="flex items-center gap-1.5 flex-wrap mt-0.5">
+            <span id="header-role" class="text-[11px] font-semibold bg-black/20 px-2 py-0.5 rounded-full truncate max-w-[165px]">
+              Infant
+            </span>
+            <span id="header-badge" class="hidden text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-300 text-amber-950 shadow-sm">
+              👑 Royal
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Age, Bank & Settings -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="text-right">
+          <div id="header-bank" class="font-extrabold text-sm text-emerald-200 tracking-tight">$0</div>
+          <div class="text-[11px] font-bold text-white/90">Age <span id="header-age">0</span></div>
+        </div>
+        <button onclick="openSettingsModal()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-base btn-press" aria-label="Settings">
+          ⚙️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN YEAR-BY-YEAR SCROLLABLE JOURNAL -->
+  <main id="journal-container" class="flex-1 overflow-y-auto journal-scroll px-3.5 py-3 space-y-3">
+    <!-- Year cards are injected dynamically here -->
+  </main>
+
+  <!-- PINNED STATS BAR SECTION -->
+  <section class="bg-white border-t border-slate-200/80 px-4 py-2.5 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10 shrink-0">
+    <div class="space-y-1.5" id="stats-wrapper">
+      <!-- Happiness -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-600 w-24 flex items-center gap-1 shrink-0">😄 Happiness</span>
+        <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+          <div id="bar-happiness" class="stat-fill h-full bg-emerald-500 rounded-full" style="width: 80%"></div>
+        </div>
+        <span id="val-happiness" class="text-[11px] font-extrabold text-slate-700 w-8 text-right">80%</span>
+      </div>
+
+      <!-- Health -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-600 w-24 flex items-center gap-1 shrink-0">❤️ Health</span>
+        <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+          <div id="bar-health" class="stat-fill h-full bg-rose-500 rounded-full" style="width: 90%"></div>
+        </div>
+        <span id="val-health" class="text-[11px] font-extrabold text-slate-700 w-8 text-right">90%</span>
+      </div>
+
+      <!-- Smarts -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-600 w-24 flex items-center gap-1 shrink-0">🧠 Smarts</span>
+        <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+          <div id="bar-smarts" class="stat-fill h-full bg-sky-500 rounded-full" style="width: 75%"></div>
+        </div>
+        <span id="val-smarts" class="text-[11px] font-extrabold text-slate-700 w-8 text-right">75%</span>
+      </div>
+
+      <!-- Looks -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-600 w-24 flex items-center gap-1 shrink-0">✨ Looks</span>
+        <div class="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+          <div id="bar-looks" class="stat-fill h-full bg-amber-400 rounded-full" style="width: 70%"></div>
+        </div>
+        <span id="val-looks" class="text-[11px] font-extrabold text-slate-700 w-8 text-right">70%</span>
+      </div>
+
+      <!-- Dynamic 5th Bar: Fame or Notoriety (Shown when > 0) -->
+      <div id="dynamic-stat-row" class="hidden flex items-center gap-2">
+        <span id="dynamic-stat-label" class="text-xs font-bold text-purple-700 w-24 flex items-center gap-1 shrink-0">🌟 Fame</span>
+        <div class="flex-1 h-2.5 bg-purple-100 rounded-full overflow-hidden border border-purple-200/70">
+          <div id="bar-dynamic" class="stat-fill h-full bg-purple-600 rounded-full" style="width: 0%"></div>
+        </div>
+        <span id="val-dynamic" class="text-[11px] font-extrabold text-purple-800 w-8 text-right">0%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM MOBILE NAVIGATION DOCK -->
+  <nav class="bg-slate-900 text-white px-2 pt-2 safe-bottom-pad flex items-center justify-around relative z-20 shrink-0">
+    <!-- 1. Occupation -->
+    <button onclick="openMenu('occupation')" class="flex flex-col items-center justify-center w-16 py-1 btn-press">
+      <div class="w-10 h-10 rounded-full bg-blue-600/90 flex items-center justify-center text-lg shadow-md mb-1">💼</div>
+      <span class="text-[10px] font-bold text-slate-200 tracking-tight">Career</span>
+    </button>
+
+    <!-- 2. Assets -->
+    <button onclick="openMenu('assets')" class="flex flex-col items-center justify-center w-16 py-1 btn-press">
+      <div class="w-10 h-10 rounded-full bg-amber-500/90 flex items-center justify-center text-lg shadow-md mb-1">💎</div>
+      <span class="text-[10px] font-bold text-slate-200 tracking-tight">Assets</span>
+    </button>
+
+    <!-- 3. BIG CENTER + AGE BUTTON -->
+    <button id="btn-age-up" onclick="ageUp()" class="flex flex-col items-center justify-center -mt-6 btn-press">
+      <div class="w-16 h-16 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600 border-4 border-slate-900 flex flex-col items-center justify-center shadow-xl age-btn-glow">
+        <span class="text-xl font-black leading-none">+</span>
+        <span class="text-[11px] font-extrabold uppercase tracking-wider mt-0.5">Age</span>
+      </div>
+    </button>
+
+    <!-- 4. Relationships -->
+    <button onclick="openMenu('relationships')" class="flex flex-col items-center justify-center w-16 py-1 btn-press">
+      <div class="w-10 h-10 rounded-full bg-pink-600/90 flex items-center justify-center text-lg shadow-md mb-1">❤️</div>
+      <span class="text-[10px] font-bold text-slate-200 tracking-tight">People</span>
+    </button>
+
+    <!-- 5. Activities / Fate Weaver -->
+    <button onclick="openMenu('activities')" class="flex flex-col items-center justify-center w-16 py-1 btn-press">
+      <div class="w-10 h-10 rounded-full bg-purple-600/90 flex items-center justify-center text-lg shadow-md mb-1">🎲</div>
+      <span class="text-[10px] font-bold text-slate-200 tracking-tight">Activities</span>
+    </button>
+  </nav>
+
+  <!-- ==================== MODALS & SHEETS ==================== -->
+
+  <!-- 1. BOTTOM SHEET MENU (Occupation, Assets, Relationships, Activities) -->
+  <div id="sheet-backdrop" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-[2px] z-30 flex items-end justify-center" onclick="closeSheet(event)">
+    <div id="sheet-panel" class="bg-white w-full max-w-[480px] max-h-[82dvh] rounded-t-3xl shadow-2xl flex flex-col overflow-hidden modal-sheet" onclick="event.stopPropagation()">
+      <!-- Sheet Handle & Header -->
+      <div class="px-5 pt-3 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div>
+          <h2 id="sheet-title" class="text-lg font-extrabold text-slate-900">Menu</h2>
+          <p id="sheet-subtitle" class="text-xs font-medium text-slate-500">Choose an action</p>
+        </div>
+        <button onclick="forceCloseSheet()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center btn-press">✕</button>
+      </div>
+      <!-- Sheet Content -->
+      <div id="sheet-content" class="p-4 overflow-y-auto space-y-2.5 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- 2. RANDOM / FATE DECISION POPUP MODAL -->
+  <div id="event-modal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden pop-card border border-slate-100">
+      <div id="event-banner" class="bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-4 text-white flex items-center gap-3">
+        <span id="event-icon" class="text-3xl bg-white/20 w-12 h-12 rounded-2xl flex items-center justify-center shrink-0">⚡</span>
+        <div>
+          <span id="event-tag" class="text-[10px] font-extrabold uppercase tracking-widest bg-black/25 px-2 py-0.5 rounded-full">Life Event</span>
+          <h3 id="event-title" class="text-lg font-extrabold leading-tight mt-1">A Crossroads</h3>
+        </div>
+      </div>
+      <div class="p-5">
+        <p id="event-desc" class="text-sm text-slate-700 leading-relaxed font-medium mb-4">
+          Something unexpected happened!
+        </p>
+        <div id="event-choices" class="space-y-2.5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CUSTOM ACTION / FATE WEAVER MODAL -->
+  <div id="custom-modal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden pop-card">
+      <div class="bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🔮</span>
+          <div>
+            <h3 class="text-base font-extrabold">Fate Weaver (Custom Action)</h3>
+            <p class="text-[11px] text-white/85">Do literally anything—no limits, no keys needed</p>
+          </div>
+        </div>
+        <button onclick="closeCustomModal()" class="w-8 h-8 rounded-full bg-white/20 text-white font-bold flex items-center justify-center">✕</button>
+      </div>
+      <div class="p-5 space-y-3">
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Type any wild idea, crime, business scheme, royal plot, or heroic act. The engine calculates your odds based on your stats, money, and background!
+        </p>
+        <textarea id="custom-action-input" rows="3" placeholder="e.g., Launch a luxury AI tech startup, Stage a coup to take over the syndicate, Propose to the Crown Prince, Start an underground street racing league..." class="w-full rounded-2xl border border-slate-300 p-3 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-200"></textarea>
+
+        <!-- Quick Inspiration Chips -->
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="fillCustomPrompt('Start an underground street racing syndicate')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-full">🏎️ Street Racing</button>
+          <button onclick="fillCustomPrompt('Launch a viral tech startup')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-full">🚀 Tech Startup</button>
+          <button onclick="fillCustomPrompt('Infiltrate the royal gala to marry royalty')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-full">👑 Royal Plot</button>
+          <button onclick="fillCustomPrompt('Pull off an international art museum heist')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-2.5 py-1 rounded-full">🎭 Museum Heist</button>
+        </div>
+
+        <button id="custom-submit-btn" onclick="executeCustomAction()" class="w-full py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-extrabold text-sm shadow-lg btn-press">
+          ✨ Execute Action
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. GOD MODE & CHARACTER CREATOR MODAL -->
+  <div id="god-modal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-[430px] max-h-[90dvh] rounded-3xl shadow-2xl flex flex-col overflow-hidden pop-card">
+      <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 px-5 py-4 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">⚡</span>
+          <div>
+            <h3 class="text-base font-extrabold">God Mode & Identity</h3>
+            <p class="text-[11px] text-white/90">100% Free — Shape your destiny anytime</p>
+          </div>
+        </div>
+        <button onclick="closeGodModeModal()" class="w-8 h-8 rounded-full bg-white/20 text-white font-bold flex items-center justify-center">✕</button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 text-sm">
+        <!-- Edit Current Life Stats -->
+        <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-amber-800">Edit Current Character</span>
+            <button onclick="maxAllStats()" class="text-[11px] font-bold bg-amber-500 text-white px-2.5 py-1 rounded-full btn-press">Max All 100%</button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">Full Name</label>
+              <input id="gm-name" type="text" class="w-full mt-0.5 px-2.5 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">Bank Balance ($)</label>
+              <input id="gm-bank" type="number" class="w-full mt-0.5 px-2.5 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">😄 Happiness: <span id="gm-lbl-hap">80</span>%</label>
+              <input id="gm-hap" type="range" min="0" max="100" oninput="document.getElementById('gm-lbl-hap').textContent=this.value" class="w-full accent-emerald-600" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">❤️ Health: <span id="gm-lbl-hea">90</span>%</label>
+              <input id="gm-hea" type="range" min="0" max="100" oninput="document.getElementById('gm-lbl-hea').textContent=this.value" class="w-full accent-rose-600" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">🧠 Smarts: <span id="gm-lbl-sma">75</span>%</label>
+              <input id="gm-sma" type="range" min="0" max="100" oninput="document.getElementById('gm-lbl-sma').textContent=this.value" class="w-full accent-sky-600" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">✨ Looks: <span id="gm-lbl-loo">70</span>%</label>
+              <input id="gm-loo" type="range" min="0" max="100" oninput="document.getElementById('gm-lbl-loo').textContent=this.value" class="w-full accent-amber-500" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-purple-700">🌟 Fame: <span id="gm-lbl-fam">0</span>%</label>
+              <input id="gm-fam" type="range" min="0" max="100" oninput="document.getElementById('gm-lbl-fam').textContent=this.value" class="w-full accent-purple-600" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-800">🕶️ Notoriety: <span id="gm-lbl-not">0</span>%</label>
+              <input id="gm-not" type="range" min="0" max="100" oninput="document.getElementById('gm-lbl-not').textContent=this.value" class="w-full accent-slate-800" />
+            </div>
+          </div>
+
+          <button onclick="applyGodModeEdits()" class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow btn-press">
+            Save Current Life Edits
+          </button>
+        </div>
+
+        <!-- Start Brand New Custom Life -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-3">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-slate-700 block">Reincarnate / New Custom Life</span>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">New Name (Optional)</label>
+              <input id="new-name" type="text" placeholder="Random Name" class="w-full mt-0.5 px-2.5 py-1.5 rounded-xl border border-slate-300 text-xs" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600">Country</label>
+              <select id="new-country" class="w-full mt-0.5 px-2 py-1.5 rounded-xl border border-slate-300 text-xs bg-white">
+                <option value="random">🌍 Random Country</option>
+                <option value="US">🇺🇸 United States</option>
+                <option value="UK">🇬🇧 United Kingdom</option>
+                <option value="JP">🇯🇵 Japan</option>
+                <option value="IT">🇮🇹 Italy</option>
+                <option value="MY">🇲🇾 Malaysia</option>
+                <option value="AE">🇦🇪 UAE (Dubai)</option>
+                <option value="BR">🇧🇷 Brazil</option>
+                <option value="MC">🇲🇨 Monaco</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-600">Starting Origin / Destiny</label>
+            <select id="new-origin" class="w-full mt-0.5 px-2.5 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white">
+              <option value="normal">🎲 Normal Citizen (Classic Start)</option>
+              <option value="wealthy">💰 Old Money Billionaire Heir ($5M Trust Fund)</option>
+              <option value="royal">👑 Born into Royalty (Prince / Princess)</option>
+              <option value="mafia">🕶️ Born into Crime Syndicate (Mafia Heir)</option>
+              <option value="prodigy">🧠 Child Prodigy (98% Smarts & Looks)</option>
+            </select>
+          </div>
+
+          <button onclick="startCustomNewLife()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 text-white font-extrabold text-xs shadow btn-press">
+            👶 Start This New Life
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SETTINGS & OPTIONAL FREE AI KEY MODAL -->
+  <div id="settings-modal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden pop-card">
+      <div class="bg-slate-900 px-5 py-4 text-white flex items-center justify-between">
+        <h3 class="text-base font-extrabold">⚙️ Settings & App Info</h3>
+        <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-full bg-white/15 text-white font-bold flex items-center justify-center">✕</button>
+      </div>
+      <div class="p-5 space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-2.5">
+          <button onclick="closeSettingsModal(); openGodModeModal();" class="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs flex flex-col items-center gap-1 btn-press">
+            <span class="text-xl">⚡</span>
+            <span>God Mode</span>
+          </button>
+          <button onclick="confirmSurrender()" class="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 font-bold text-xs flex flex-col items-center gap-1 btn-press">
+            <span class="text-xl">🏳️</span>
+            <span>End Current Life</span>
+          </button>
+        </div>
+
+        <!-- Optional Free AI Key Box -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-800">Optional AI Storyteller</span>
+            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Not Required</span>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">
+            The game works 100% offline with zero keys. If you ever want live LLM events in Fate Weaver, paste a free <strong>Groq</strong> (<code>gsk_...</code>) or <strong>Gemini</strong> (<code>AIza...</code>) key below:
+          </p>
+          <input id="opt-api-key" type="password" placeholder="Optional: gsk_... or AIza..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs" />
+          <button onclick="saveOptionalKey()" class="w-full py-2 rounded-xl bg-slate-800 text-white font-bold text-xs btn-press">
+            Save Key Locally
+          </button>
+        </div>
+
+        <!-- Install Tip -->
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-3 text-[11px] text-blue-900 leading-relaxed">
+          <strong>📱 Install on Phone:</strong> Tap <strong>Share → Add to Home Screen</strong> (iPhone) or <strong>Menu ⋮ → Add to Home Screen</strong> (Android) for full-screen ad-free play.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. TOMBSTONE / LIFE SUMMARY MODAL -->
+  <div id="tombstone-modal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-[420px] rounded-3xl shadow-2xl overflow-hidden pop-card text-center">
+      <div class="bg-gradient-to-b from-slate-800 to-slate-950 px-6 py-6 text-white">
+        <div class="text-5xl mb-2">🪦</div>
+        <div id="tomb-ribbon" class="inline-block px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-widest mb-2">
+          Model Citizen
+        </div>
+        <h2 id="tomb-name" class="text-2xl font-extrabold">Alex Mercer</h2>
+        <p id="tomb-years" class="text-xs text-slate-300 mt-1">Died at Age 84 • United States 🇺🇸</p>
+      </div>
+      <div class="p-5 space-y-4">
+        <p id="tomb-epitaph" class="text-xs text-slate-600 italic leading-relaxed">
+          "Lived a full and unforgettable life."
+        </p>
+        <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
+          <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase">Net Worth</div>
+            <div id="tomb-worth" class="text-xs font-extrabold text-emerald-600 mt-0.5">$120,000</div>
+          </div>
+          <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase">Legacy</div>
+            <div id="tomb-title" class="text-xs font-extrabold text-slate-800 mt-0.5 truncate">Executive</div>
+          </div>
+          <div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase">Karma</div>
+            <div id="tomb-karma" class="text-xs font-extrabold text-indigo-600 mt-0.5">Good</div>
+          </div>
+        </div>
+        <div class="flex gap-2.5">
+          <button onclick="continueAsChild()" id="btn-continue-child" class="hidden flex-1 py-3 rounded-2xl bg-indigo-600 text-white font-extrabold text-xs shadow btn-press">
+            👶 Play as Child
+          </button>
+          <button onclick="openGodModeModal()" class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-extrabold text-xs shadow btn-press">
+            ✨ Start New Life
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-xl z-50 whitespace-nowrap">
+    Saved!
+  </div>
+</div>
+
+<script>
+  // ==================== PWA MANIFEST SETUP ====================
+  (function setupManifest() {
+    const manifest = {
+      name: "LifeForge: Unlimited",
+      short_name: "LifeForge",
+      start_url: ".",
+      display: "standalone",
+      background_color: "#F4F6F9",
+      theme_color: "#E11D48",
+      icons: [{
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23E11D48'/><text x='50' y='68' font-size='56' text-anchor='middle'>🧬</text></svg>",
+        sizes: "192x192",
+        type: "image/svg+xml"
+      }]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    document.getElementById('pwa-manifest').setAttribute('href', URL.createObjectURL(blob));
+  })();
+
+  // ==================== DATA & CONSTANTS ====================
+  const COUNTRIES = {
+    US: { name: "United States", flag: "🇺🇸", first: ["Liam", "Noah", "Maya", "Chloe", "Ethan", "Zoe", "Mason", "Aria"], last: ["Mercer", "Vance", "Sterling", "Hayes", "Brooks", "Carter"] },
+    UK: { name: "United Kingdom", flag: "🇬🇧", first: ["Oliver", "Arthur", "Amelia", "Isla", "Leo", "Freya", "Theo", "Clara"], last: ["Kensington", "Windsor", "Ashford", "Cavendish", "Thorne"] },
+    JP: { name: "Japan", flag: "🇯🇵", first: ["Ren", "Haruto", "Hina", "Yui", "Kaito", "Sakura", "Sora", "Mio"], last: ["Takahashi", "Sato", "Kuroda", "Fujimoto", "Aoyama"] },
+    IT: { name: "Italy", flag: "🇮🇹", first: ["Lorenzo", "Matteo", "Sofia", "Giulia", "Marco", "Elena", "Dante", "Lucia"], last: ["Moretti", "Conti", "Bellini", "Rinaldi", "Visconti"] },
+    MY: { name: "Malaysia", flag: "🇲🇾", first: ["Aiden", "Amir", "Nurul", "Mei", "Daniel", "Aisha", "Ryan", "Zara"], last: ["Rahman", "Tan", "Ibrahim", "Lim", "Zulkifli"] },
+    AE: { name: "UAE", flag: "🇦🇪", first: ["Zayed", "Tariq", "Layla", "Yasmin", "Omar", "Noor", "Rashid", "Amira"], last: ["Al-Maktoum", "Al-Mansoor", "Al-Nahyan", "Al-Qasimi"] },
+    BR: { name: "Brazil", flag: "🇧🇷", first: ["Gabriel", "Lucas", "Helena", "Alice", "Rafael", "Camila", "Diego", "Valentina"], last: ["Silva", "Santos", "Oliveira", "Costa", "Almeida"] },
+    MC: { name: "Monaco", flag: "🇲🇨", first: ["Louis", "Alexandre", "Camille", "Charlotte", "Pierre", "Grace", "Henri"], last: ["Grimaldi", "Beaumont", "Laurent", "Deville"] }
+  };
+
+  const JOBS_DB = [
+    { id: "barista", title: "Artisan Barista", salary: 28000, reqSmarts: 15, reqEdu: "none", icon: "☕" },
+    { id: "streamer", title: "Content Creator", salary: 42000, reqSmarts: 25, reqEdu: "none", icon: "📱", fameGain: 4 },
+    { id: "sales", title: "Luxury Sales Rep", salary: 58000, reqSmarts: 35, reqEdu: "none", icon: "👔" },
+    { id: "soldier", title: "Special Forces Operative", salary: 72000, reqSmarts: 45, reqEdu: "none", icon: "🪖" },
+    { id: "dev", title: "AI Software Engineer", salary: 135000, reqSmarts: 70, reqEdu: "uni", icon: "💻" },
+    { id: "actor", title: "Lead Film Actor", salary: 240000, reqSmarts: 40, reqEdu: "none", icon: "🎬", fameGain: 9 },
+    { id: "surgeon", title: "Neurosurgeon", salary: 360000, reqSmarts: 88, reqEdu: "uni", icon: "🩺" },
+    { id: "ceo", title: "Tech Startup Founder & CEO", salary: 650000, reqSmarts: 80, reqEdu: "uni", icon: "🚀", fameGain: 6 }
+  ];
+
+  const MAFIA_RANKS = [
+    { rank: "Associate", salary: 45000, notoriety: 15 },
+    { rank: "Soldier", salary: 95000, notoriety: 32 },
+    { rank: "Caporegime", salary: 220000, notoriety: 55 },
+    { rank: "Underboss", salary: 550000, notoriety: 78 },
+    { rank: "Syndicate Godfather", salary: 1500000, notoriety: 100 }
+  ];
+
+  const ROYAL_RANKS = [
+    { rank: "Duke / Duchess", salary: 400000, fame: 45 },
+    { rank: "Crown Prince / Princess", salary: 1200000, fame: 75 },
+    { rank: "Sovereign Monarch", salary: 3500000, fame: 100 }
+  ];
+
+  const ASSETS_SHOP = [
+    { id: "car_sport", name: "Midnight GT Supercar", price: 145000, upkeep: 4500, happiness: 8, looks: 4, icon: "🏎️" },
+    { id: "house_villa", name: "Cliffside Modern Villa", price: 850000, upkeep: 14000, happiness: 14, looks: 3, icon: "🏡" },
+    { id: "penthouse", name: "Skyline Royal Penthouse", price: 3200000, upkeep: 42000, happiness: 20, fame: 8, icon: "🏙️" },
+    { id: "yacht", name: "140ft Superyacht", price: 12000000, upkeep: 150000, happiness: 25, fame: 15, icon: "🛥️" },
+    { id: "jet", name: "Private Gulfstream Jet", price: 28000000, upkeep: 320000, happiness: 30, fame: 22, icon: "🛩️" },
+    { id: "island", name: "Private Tropical Island", price: 95000000, upkeep: 850000, happiness: 40, fame: 35, icon: "🏝️" }
+  ];
+
+  const RANDOM_EVENTS = [
+    {
+      minAge: 5, maxAge: 16, tag: "Schoolyard", icon: "🎒", title: "The Schoolyard Bully",
+      desc: "A bigger kid demands your lunch money in front of everyone.",
+      choices: [
+        { text: "Stand your ground & fight back", effect: (s) => { s.health -= 8; s.happiness += 10; return "You took a punch, landed a solid hook, and earned instant respect!"; } },
+        { text: "Outsmart them with a witty comeback", reqSmarts: 55, effect: (s) => { s.smarts += 4; s.happiness += 12; return "The whole hallway laughed at them. They walked away humiliated."; } },
+        { text: "Hand over the cash quietly", effect: (s) => { s.happiness -= 10; s.karma += 5; return "You avoided getting hurt, though your pride took a hit."; } }
+      ]
+    },
+    {
+      minAge: 14, maxAge: 24, tag: "Viral Moment", icon: "📱", title: "Accidental Viral Video",
+      desc: "A clip of you doing an insane stunt just hit 4 million views overnight!",
+      choices: [
+        { text: "Monetize it & launch a creator channel", effect: (s) => { s.bank += 25000; s.fame += 18; s.happiness += 12; return "Sponsors flooded your inbox! You banked $25,000 and gained 18% Fame."; } },
+        { text: "Keep a low profile and stay private", effect: (s) => { s.smarts += 3; s.happiness += 4; return "You ignored the internet hype and focused on your real life."; } }
+      ]
+    },
+    {
+      minAge: 18, maxAge: 65, tag: "Underworld", icon: "🕶️", title: "A Mysterious Offer",
+      desc: "A sharply dressed stranger slides a briefcase across your table at a late-night diner.",
+      choices: [
+        { text: "Accept the Syndicate initiation", effect: (s) => { s.path = "mafia"; s.mafiaRank = 0; s.notoriety += 20; s.bank += 30000; return "You took the oath. You are now an Associate in the Crime Syndicate (+$30,000)!"; } },
+        { text: "Report them to the authorities", effect: (s) => { s.karma += 18; s.bank += 10000; s.happiness += 6; return "Police rewarded you $10,000 for the tip, boosting your Karma."; } },
+        { text: "Walk away without a word", effect: (s) => { return "You left the diner and never looked back."; } }
+      ]
+    },
+    {
+      minAge: 19, maxAge: 45, tag: "High Society", icon: "👑", title: "Royal Charity Gala",
+      desc: "Through a stroke of luck, you receive a golden invitation to a royal palace gala.",
+      choices: [
+        { text: "Charm a member of the Royal Family", reqLooks: 65, effect: (s) => {
+          s.relationships.push({ id: Date.now(), name: "Prince/Princess Julian", role: "Royal Partner", rel: 85, isRoyal: true, alive: true });
+          s.fame += 20; s.happiness += 15;
+          return "Sparks flew on the ballroom floor! You are now dating Royalty!";
+        }},
+        { text: "Network with billionaire investors", effect: (s) => { s.bank += 75000; s.smarts += 4; return "Your pitch impressed a venture capitalist—you secured a $75,000 angel check!"; } },
+        { text: "Enjoy the free caviar and champagne", effect: (s) => { s.happiness += 10; return "You had an unforgettable night living like royalty."; } }
+      ]
+    },
+    {
+      minAge: 20, maxAge: 75, tag: "Fortune", icon: "📈", title: "Crypto & Tech Surge",
+      desc: "An obscure quantum-computing token you bought years ago is skyrocketing.",
+      choices: [
+        { text: "Cash out everything right now", effect: (s) => { const gain = Math.floor(Math.random() * 180000) + 40000; s.bank += gain; s.happiness += 14; return `You timed the top and cashed out $${gain.toLocaleString()}!`; } },
+        { text: "Diamond hands—let it ride!", effect: (s) => {
+          if (Math.random() > 0.45) { const gain = 450000; s.bank += gain; s.happiness += 20; return `It went 10x! You made $${gain.toLocaleString()}!`; }
+          else { s.happiness -= 12; return "The market crashed overnight and wiped out the gains."; }
+        }}
+      ]
+    },
+    {
+      minAge: 16, maxAge: 85, tag: "Health", icon: "🏥", title: "Sudden Exhaustion",
+      desc: "You've been pushing yourself non-stop and collapsed during the afternoon.",
+      choices: [
+        { text: "Pay for elite private medical care ($5,000)", effect: (s) => { if (s.bank >= 5000) { s.bank -= 5000; s.health = Math.min(100, s.health + 18); return "Top specialists restored your health completely."; } else { s.health -= 8; return "You couldn't afford private care and had to rest at home."; } } },
+        { text: "Sleep it off and drink water", effect: (s) => { s.health -= 5; return "You recovered slowly, though you feel a bit drained."; } }
+      ]
+    }
+  ];
+
+  // ==================== GAME STATE ====================
+  let state = null;
+
+  function clamp(val, min = 0, max = 100) {
+    return Math.max(min, Math.min(max, Math.round(val)));
+  }
+
+  function formatMoney(num) {
+    const sign = num < 0 ? "-" : "";
+    const abs = Math.abs(Math.round(num));
+    if (abs >= 1e9) return `${sign}$${(abs / 1e9).toFixed(2)}B`;
+    if (abs >= 1e6) return `${sign}$${(abs / 1e6).toFixed(2)}M`;
+    return `${sign}$${abs.toLocaleString()}`;
+  }
+
+  function createInitialState(options = {}) {
+    const countryKeys = Object.keys(COUNTRIES);
+    const cCode = options.country && options.country !== "random"
+      ? options.country
+      : countryKeys[Math.floor(Math.random() * countryKeys.length)];
+    const country = COUNTRIES[cCode];
+
+    const fName = country.first[Math.floor(Math.random() * country.first.length)];
+    const lName = country.last[Math.floor(Math.random() * country.last.length)];
+    const fullName = (options.name && options.name.trim()) ? options.name.trim() : `${fName} ${lName}`;
+    const origin = options.origin || "normal";
+
+    let bank = 0;
+    let smarts = Math.floor(Math.random() * 45) + 45;
+    let looks = Math.floor(Math.random() * 45) + 45;
+    let health = Math.floor(Math.random() * 25) + 75;
+    let happiness = 85;
+    let fame = 0;
+    let notoriety = 0;
+    let path = "civilian"; // civilian, royal, mafia
+    let royalRank = -1;
+    let mafiaRank = -1;
+    let birthNote = `You were born in ${country.name} ${country.flag} to loving middle-class parents.`;
+
+    if (origin === "wealthy") {
+      bank = 5000000;
+      looks = clamp(looks + 15);
+      birthNote = `You were born into an ultra-wealthy dynasty in ${country.name} ${country.flag} with a $5,000,000 trust fund!`;
+    } else if (origin === "royal") {
+      bank = 15000000;
+      fame = 65;
+      path = "royal";
+      royalRank = 1;
+      birthNote = `Royal trumpets sounded across ${country.name} ${country.flag}! You were born a Crown Royal with $15,000,000!`;
+    } else if (origin === "mafia") {
+      bank = 250000;
+      notoriety = 30;
+      path = "mafia";
+      mafiaRank = 0;
+      birthNote = `You were born into the inner circle of the ${lName} Crime Syndicate in ${country.name} ${country.flag}.`;
+    } else if (origin === "prodigy") {
+      smarts = 98;
+      looks = 95;
+      health = 98;
+      birthNote = `Doctors were amazed at your birth in ${country.name} ${country.flag}—you are a certified genetic prodigy!`;
+    }
+
+    const motherName = `${country.first[Math.floor(Math.random() * country.first.length)]} ${lName}`;
+    const fatherName = `${country.first[Math.floor(Math.random() * country.first.length)]} ${lName}`;
+
+    return {
+      alive: true,
+      name: fullName,
+      countryCode: cCode,
+      countryName: country.name,
+      flag: country.flag,
+      age: 0,
+      bank,
+      happiness,
+      health,
+      smarts,
+      looks,
+      fame,
+      notoriety,
+      karma: 50,
+      education: "none", // none, school, uni
+      inSchool: false,
+      inPrison: false,
+      prisonYears: 0,
+      path,
+      royalRank,
+      mafiaRank,
+      job: null,
+      assets: [],
+      relationships: [
+        { id: 1, name: motherName, role: "Mother", rel: 90, alive: true },
+        { id: 2, name: fatherName, role: "Father", rel: 88, alive: true }
+      ],
+      journal: [
+        {
+          age: 0,
+          entries: [
+            { text: birthNote, type: origin === "royal" || origin === "mafia" ? "special" : "normal" }
+          ]
+        }
+      ]
+    };
+  }
+
+  // ==================== STORAGE ====================
+  function saveState() {
+    try {
+      localStorage.setItem("lifeforge_save_v1", JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem("lifeforge_save_v1");
+      if (raw) {
+        state = JSON.parse(raw);
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  // ==================== UI RENDERING ====================
+  function getAvatarEmoji() {
+    if (!state.alive) return "💀";
+    if (state.inPrison) return "⛓️";
+    if (state.path === "royal") return "🤴";
+    if (state.path === "mafia") return "🕶️";
+    if (state.fame >= 60) return "🌟";
+    if (state.age < 3) return "👶";
+    if (state.age < 13) return "🧒";
+    if (state.age < 20) return "🧑";
+    if (state.age < 60) return "🧔";
+    return "🧓";
+  }
+
+  function getRoleLabel() {
+    if (!state.alive) return "Deceased";
+    if (state.inPrison) return `Inmate (${state.prisonYears}y left)`;
+    if (state.path === "royal" && state.royalRank >= 0) return ROYAL_RANKS[state.royalRank].rank;
+    if (state.path === "mafia" && state.mafiaRank >= 0) return MAFIA_RANKS[state.mafiaRank].rank;
+    if (state.job) return state.job.title;
+    if (state.age < 5) return "Toddler";
+    if (state.age < 18) return "Student";
+    if (state.education === "uni") return "University Graduate";
+    return "Unemployed";
+  }
+
+  function renderAll() {
+    // Header
+    document.getElementById("header-avatar").textContent = getAvatarEmoji();
+    document.getElementById("header-name").textContent = state.name;
+    document.getElementById("header-flag").textContent = state.flag;
+    document.getElementById("header-age").textContent = state.age;
+    document.getElementById("header-bank").textContent = formatMoney(state.bank);
+    document.getElementById("header-role").textContent = getRoleLabel();
+
+    const badgeEl = document.getElementById("header-badge");
+    if (state.path === "royal") {
+      badgeEl.textContent = "👑 Royal";
+      badgeEl.className = "text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-300 text-amber-950 shadow-sm";
+    } else if (state.path === "mafia") {
+      badgeEl.textContent = "🕶️ Syndicate";
+      badgeEl.className = "text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-900 text-rose-400 border border-rose-500/40";
+    } else if (state.fame >= 40) {
+      badgeEl.textContent = "🌟 Famous";
+      badgeEl.className = "text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-200 text-purple-950";
+    } else {
+      badgeEl.className = "hidden";
+    }
+
+    // Stats
+    updateStatBar("happiness", state.happiness, "bg-emerald-500");
+    updateStatBar("health", state.health, state.health < 30 ? "bg-red-600" : "bg-rose-500");
+    updateStatBar("smarts", state.smarts, "bg-sky-500");
+    updateStatBar("looks", state.looks, "bg-amber-400");
+
+    // Dynamic 5th Bar (Fame vs Notoriety)
+    const dynRow = document.getElementById("dynamic-stat-row");
+    if (state.fame > 0 || state.notoriety > 0) {
+      dynRow.classList.remove("hidden");
+      if (state.notoriety > state.fame) {
+        document.getElementById("dynamic-stat-label").innerHTML = "🕶️ Notoriety";
+        document.getElementById("dynamic-stat-label").className = "text-xs font-bold text-slate-800 w-24 flex items-center gap-1 shrink-0";
+        updateStatBar("dynamic", state.notoriety, "bg-slate-800");
+      } else {
+        document.getElementById("dynamic-stat-label").innerHTML = "🌟 Fame";
+        document.getElementById("dynamic-stat-label").className = "text-xs font-bold text-purple-700 w-24 flex items-center gap-1 shrink-0";
+        updateStatBar("dynamic", state.fame, "bg-purple-600");
+      }
+    } else {
+      dynRow.classList.add("hidden");
+    }
+
+    // Journal
+    const journalEl = document.getElementById("journal-container");
+    journalEl.innerHTML = state.journal.map(yearBlock => {
+      const itemsHtml = yearBlock.entries.map(item => {
+        let colorClass = "text-slate-700";
+        if (item.type === "gain") colorClass = "text-emerald-700 font-semibold";
+        if (item.type === "loss") colorClass = "text-rose-600 font-semibold";
+        if (item.type === "special") colorClass = "text-purple-700 font-bold";
+        return `<li class="text-[13px] leading-snug ${colorClass} flex items-start gap-2">
+          <span class="text-slate-400 mt-0.5">•</span>
+          <span>${item.text}</span>
+        </li>`;
+      }).join("");
+
+      return `
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/70">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">Age ${yearBlock.age}</span>
+          </div>
+          <ul class="space-y-1.5">${itemsHtml}</ul>
+        </div>
+      `;
+    }).join("");
+
+    // Auto-scroll journal to bottom smoothly
+    requestAnimationFrame(() => {
+      journalEl.scrollTop = journalEl.scrollHeight;
+    });
+
+    saveState();
+  }
+
+  function updateStatBar(key, val, colorClass) {
+    const v = clamp(val);
+    const bar = document.getElementById(`bar-${key}`);
+    const lbl = document.getElementById(`val-${key}`);
+    if (bar && lbl) {
+      bar.style.width = `${v}%`;
+      bar.className = `stat-fill h-full rounded-full ${colorClass}`;
+      lbl.textContent = `${v}%`;
+    }
+  }
+
+  function logEvent(text, type = "normal") {
+    let currentBlock = state.journal.find(b => b.age === state.age);
+    if (!currentBlock) {
+      currentBlock = { age: state.age, entries: [] };
+      state.journal.push(currentBlock);
+    }
+    currentBlock.entries.push({ text, type });
+    renderAll();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.remove("hidden");
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.classList.add("hidden"), 2200);
+  }
+
+  // ==================== CORE +AGE ENGINE ====================
+  function ageUp() {
+    if (!state.alive) {
+      openTombstone();
+      return;
+    }
+
+    state.age += 1;
+    const yearEntries = [];
+
+    // Prison Check
+    if (state.inPrison) {
+      state.prisonYears -= 1;
+      state.happiness = clamp(state.happiness - 6);
+      state.health = clamp(state.health - 3);
+      if (state.prisonYears <= 0) {
+        state.inPrison = false;
+        yearEntries.push({ text: "You served your sentence and walked out of prison a free person!", type: "special" });
+      } else {
+        yearEntries.push({ text: `You spent another hard year behind bars (${state.prisonYears} years remaining).`, type: "loss" });
+      }
+    } else {
+      // School Milestones
+      if (state.age === 5) {
+        state.inSchool = true;
+        state.education = "school";
+        yearEntries.push({ text: "You started Elementary School! Time to hit the books.", type: "normal" });
+      } else if (state.age === 18 && state.inSchool) {
+        state.inSchool = false;
+        yearEntries.push({ text: "🎓 You graduated from High School!", type: "gain" });
+      }
+
+      // Annual Income & Upkeep
+      let annualNet = 0;
+      if (state.path === "royal" && state.royalRank >= 0) {
+        const r = ROYAL_RANKS[state.royalRank];
+        annualNet += r.salary;
+        state.fame = clamp(state.fame + 2);
+        yearEntries.push({ text: `Received ${formatMoney(r.salary)} in Royal Sovereign Allowance as ${r.rank}.`, type: "special" });
+      } else if (state.path === "mafia" && state.mafiaRank >= 0) {
+        const m = MAFIA_RANKS[state.mafiaRank];
+        annualNet += m.salary;
+        state.notoriety = clamp(state.notoriety + 2);
+        yearEntries.push({ text: `Collected ${formatMoney(m.salary)} in Syndicate tribute as ${m.rank}.`, type: "special" });
+      } else if (state.job) {
+        annualNet += state.job.salary;
+        if (state.job.fameGain) state.fame = clamp(state.fame + state.job.fameGain);
+        yearEntries.push({ text: `Earned ${formatMoney(state.job.salary)} as a ${state.job.title}.`, type: "gain" });
+      }
+
+      // Asset Upkeep & Appreciation
+      if (state.assets.length > 0) {
+        let totalUpkeep = 0;
+        state.assets.forEach(a => {
+          totalUpkeep += a.upkeep;
+          a.price = Math.round(a.price * 1.04);
+        });
+        annualNet -= totalUpkeep;
+        yearEntries.push({ text: `Paid ${formatMoney(totalUpkeep)} in luxury asset maintenance.`, type: "loss" });
+      }
+
+      state.bank += annualNet;
+    }
+
+    // Natural Aging Effects
+    if (state.age > 55) {
+      state.health = clamp(state.health - Math.floor(Math.random() * 4 + 1));
+      state.looks = clamp(state.looks - 2);
+    }
+
+    // Relationship passive drift
+    state.relationships.forEach(r => {
+      if (r.alive) r.rel = clamp(r.rel - 1);
+    });
+
+    if (yearEntries.length === 0) {
+      const flavor = [
+        "Another peaceful year passed by.",
+        "You spent time reflecting on your goals for the future.",
+        "You kept up with daily routines and stayed out of trouble."
+      ];
+      yearEntries.push({ text: flavor[Math.floor(Math.random() * flavor.length)], type: "normal" });
+    }
+
+    state.journal.push({ age: state.age, entries: yearEntries });
+
+    // Check Death Condition
+    const deathChance = state.health <= 0 ? 1 : (state.age > 78 ? (state.age - 75) * 0.045 : (state.health < 15 ? 0.25 : 0.005));
+    if (state.age >= 4 && Math.random() < deathChance) {
+      triggerDeath(state.health <= 0 ? "Your health gave out completely." : "You passed away peacefully of old age.");
+      return;
+    }
+
+    renderAll();
+
+    // Trigger Random Decision Popup (~45% chance per year when not in prison)
+    if (!state.inPrison && Math.random() < 0.48) {
+      triggerRandomEvent();
+    }
+  }
+
+  function triggerRandomEvent() {
+    const eligible = RANDOM_EVENTS.filter(e => state.age >= e.minAge && state.age <= e.maxAge);
+    if (eligible.length === 0) return;
+    const ev = eligible[Math.floor(Math.random() * eligible.length)];
+
+    document.getElementById("event-icon").textContent = ev.icon;
+    document.getElementById("event-tag").textContent = ev.tag;
+    document.getElementById("event-title").textContent = ev.title;
+    document.getElementById("event-desc").textContent = ev.desc;
+
+    const choicesEl = document.getElementById("event-choices");
+    choicesEl.innerHTML = "";
+
+    ev.choices.forEach(choice => {
+      const locked = (choice.reqSmarts && state.smarts < choice.reqSmarts) || (choice.reqLooks && state.looks < choice.reqLooks);
+      const btn = document.createElement("button");
+      btn.className = locked
+        ? "w-full text-left p-3.5 rounded-2xl bg-slate-100 text-slate-400 text-xs font-bold border border-slate-200 cursor-not-allowed"
+        : "w-full text-left p-3.5 rounded-2xl bg-slate-50 hover:bg-indigo-50 text-slate-800 text-xs font-bold border border-slate-200 hover:border-indigo-300 transition btn-press";
+      btn.textContent = locked
+        ? `🔒 ${choice.text} (Requires ${choice.reqSmarts ? choice.reqSmarts + '% Smarts' : choice.reqLooks + '% Looks'})`
+        : choice.text;
+
+      if (!locked) {
+        btn.onclick = () => {
+          document.getElementById("event-modal").classList.add("hidden");
+          const resultMsg = choice.effect(state);
+          logEvent(resultMsg, "special");
+        };
+      }
+      choicesEl.appendChild(btn);
+    });
+
+    document.getElementById("event-modal").classList.remove("hidden");
+  }
+
+  // ==================== MENUS (CAREER, ASSETS, PEOPLE, ACTIVITIES) ====================
+  function openMenu(tab) {
+    if (!state.alive) { openTombstone(); return; }
+    const titleEl = document.getElementById("sheet-title");
+    const subEl = document.getElementById("sheet-subtitle");
+    const contentEl = document.getElementById("sheet-content");
+    contentEl.innerHTML = "";
+
+    if (tab === "occupation") {
+      titleEl.textContent = "💼 Career, Royalty & Syndicate";
+      subEl.textContent = `Current Role: ${getRoleLabel()}`;
+
+      // Education Section
+      if (state.age >= 18 && state.education !== "uni" && !state.inPrison) {
+        contentEl.innerHTML += `
+          <div class="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-extrabold text-sky-950">🎓 Attend University ($40,000)</div>
+              <div class="text-[11px] text-sky-700">Unlocks High-Paying CEO, Tech & Medical Careers</div>
+            </div>
+            <button onclick="enrollUniversity()" class="px-3 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold btn-press">Enroll</button>
+          </div>
+        `;
+      }
+
+      // Royal / Mafia Promotion Track
+      if (state.path === "royal") {
+        const nextR = ROYAL_RANKS[state.royalRank + 1];
+        contentEl.innerHTML += `
+          <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+            <div class="text-xs font-extrabold text-amber-900">👑 Royal Palace Duties</div>
+            <button onclick="royalDuty()" class="w-full py-2.5 rounded-xl bg-amber-500 text-white font-bold text-xs btn-press">Hold Royal Court (+Fame & Happiness)</button>
+            ${nextR ? `<button onclick="promoteRoyal()" class="w-full py-2.5 rounded-xl bg-slate-900 text-amber-300 font-bold text-xs btn-press">Ascend to ${nextR.rank} (Req 80% Fame)</button>` : ''}
+          </div>
+        `;
+      } else if (state.path === "mafia") {
+        const nextM = MAFIA_RANKS[state.mafiaRank + 1];
+        contentEl.innerHTML += `
+          <div class="p-3.5 rounded-2xl bg-slate-900 text-white space-y-2">
+            <div class="text-xs font-extrabold text-rose-400">🕶️ Crime Syndicate Operations</div>
+            <button onclick="mafiaExtortion()" class="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-xs btn-press">Run Syndicate Racket (+Cash & Notoriety)</button>
+            ${nextM ? `<button onclick="promoteMafia()" class="w-full py-2.5 rounded-xl bg-white/15 text-white font-bold text-xs btn-press">Challenge for ${nextM.rank}</button>` : ''}
+          </div>
+        `;
+      }
+
+      // Standard Job Board
+      if (state.age >= 16 && !state.inPrison) {
+        contentEl.innerHTML += `<div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 pt-2">Job Listings</div>`;
+        JOBS_DB.forEach(job => {
+          const isCurrent = state.job && state.job.id === job.id;
+          contentEl.innerHTML += `
+            <div class="p-3 rounded-2xl border ${isCurrent ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white'} flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">${job.icon}</span>
+                <div>
+                  <div class="text-xs font-extrabold text-slate-900">${job.title}</div>
+                  <div class="text-[11px] text-emerald-700 font-bold">${formatMoney(job.salary)}/yr • Req ${job.reqSmarts}% Smarts ${job.reqEdu === 'uni' ? '+ Uni' : ''}</div>
+                </div>
+              </div>
+              <button onclick="applyJob('${job.id}')" class="px-3 py-1.5 rounded-xl ${isCurrent ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-white'} text-xs font-bold btn-press">
+                ${isCurrent ? 'Active' : 'Apply'}
+              </button>
+            </div>
+          `;
+        });
+      } else if (state.age < 16) {
+        contentEl.innerHTML += `<div class="p-4 text-center text-xs text-slate-500">Focus on school! Job listings unlock at Age 16.</div>`;
+      }
+    }
+
+    else if (tab === "assets") {
+      titleEl.textContent = "💎 Luxury Assets & Empire";
+      subEl.textContent = `Available Cash: ${formatMoney(state.bank)}`;
+
+      if (state.assets.length > 0) {
+        contentEl.innerHTML += `<div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Your Portfolio (Tap to Sell)</div>`;
+        state.assets.forEach((asset, idx) => {
+          contentEl.innerHTML += `
+            <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl">${asset.icon}</span>
+                <div>
+                  <div class="text-xs font-extrabold text-slate-900">${asset.name}</div>
+                  <div class="text-[11px] text-slate-600">Value: ${formatMoney(asset.price)} • Upkeep: ${formatMoney(asset.upkeep)}/yr</div>
+                </div>
+              </div>
+              <button onclick="sellAsset(${idx})" class="px-3 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold btn-press">Sell</button>
+            </div>
+          `;
+        });
+      }
+
+      contentEl.innerHTML += `<div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 pt-2">Luxury Marketplace</div>`;
+      ASSETS_SHOP.forEach(item => {
+        contentEl.innerHTML += `
+          <div class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">${item.icon}</span>
+              <div>
+                <div class="text-xs font-extrabold text-slate-900">${item.name}</div>
+                <div class="text-[11px] text-slate-500">${formatMoney(item.price)} • +${item.happiness}% Happy</div>
+              </div>
+            </div>
+            <button onclick="buyAsset('${item.id}')" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold btn-press">Buy</button>
+          </div>
+        `;
+      });
+    }
+
+    else if (tab === "relationships") {
+      titleEl.textContent = "❤️ Relationships & Royalty";
+      subEl.textContent = "Nurture bonds, marry into royalty, or start a family";
+
+      if (state.age >= 18 && !state.inPrison) {
+        contentEl.innerHTML += `
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <button onclick="findPartner(false)" class="p-3 rounded-2xl bg-pink-50 border border-pink-200 text-pink-900 font-bold text-xs btn-press">💘 Find Date</button>
+            <button onclick="findPartner(true)" class="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs btn-press">👑 Seek Royal Suitor</button>
+          </div>
+        `;
+      }
+
+      state.relationships.forEach((person, idx) => {
+        if (!person.alive) return;
+        const isPartner = person.role.includes("Partner") || person.role.includes("Spouse");
+        contentEl.innerHTML += `
+          <div class="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-extrabold text-slate-900">${person.name} ${person.isRoyal ? '👑' : ''}</div>
+                <div class="text-[11px] text-slate-500">${person.role}</div>
+              </div>
+              <div class="text-right">
+                <span class="text-[11px] font-extrabold text-pink-600">❤️ ${person.rel}%</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="interactPerson(${idx}, 'time')" class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-800 btn-press">🎉 Spend Time</button>
+              <button onclick="interactPerson(${idx}, 'money')" class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[11px] font-bold text-emerald-800 btn-press">💸 Ask Money</button>
+              ${isPartner && !person.role.includes("Spouse") ? `<button onclick="interactPerson(${idx}, 'propose')" class="px-2.5 py-1.5 rounded-xl bg-amber-100 text-[11px] font-bold text-amber-900 btn-press">💍 Propose</button>` : ''}
+              ${person.role.includes("Spouse") ? `<button onclick="interactPerson(${idx}, 'baby')" class="px-2.5 py-1.5 rounded-xl bg-purple-100 text-[11px] font-bold text-purple-900 btn-press">👶 Have Baby</button>` : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    else if (tab === "activities") {
+      titleEl.textContent = "🎲 Activities & Fate Weaver";
+      subEl.textContent = "Shape your stats, commit crimes, or write your own destiny";
+
+      const acts = [
+        { icon: "🔮", title: "Fate Weaver (Type ANY Custom Action)", desc: "Unlimited freedom—start anything, plot anything", color: "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white", fn: "forceCloseSheet(); openCustomModal();" },
+        { icon: "🏋️", title: "Hit the Luxury Gym ($500)", desc: "Boost Health & Looks", color: "bg-white border border-slate-200 text-slate-900", fn: "doActivity('gym')" },
+        { icon: "📚", title: "Study & Speed-Read", desc: "Boost Smarts for free", color: "bg-white border border-slate-200 text-slate-900", fn: "doActivity('study')" },
+        { icon: "🎰", title: "High-Stakes Casino ($5,000)", desc: "Double or nothing!", color: "bg-white border border-slate-200 text-slate-900", fn: "doActivity('casino')" },
+        { icon: "📱", title: "Post Viral Content", desc: "Build Fame & Social Clout", color: "bg-white border border-slate-200 text-slate-900", fn: "doActivity('fame')" },
+        { icon: "🎭", title: "Pull a Bank Heist (High Risk)", desc: "Steal $250,000+ or risk prison", color: "bg-rose-50 border border-rose-200 text-rose-950", fn: "doActivity('heist')" },
+        { icon: "✈️", title: "Emigrate to Another Country", desc: "Start fresh in a new nation ($10,000)", color: "bg-white border border-slate-200 text-slate-900", fn: "doActivity('emigrate')" }
+      ];
+
+      acts.forEach(a => {
+        contentEl.innerHTML += `
+          <button onclick="${a.fn}" class="w-full text-left p-3.5 rounded-2xl ${a.color} shadow-sm flex items-center gap-3 btn-press">
+            <span class="text-2xl">${a.icon}</span>
+            <div>
+              <div class="text-xs font-extrabold">${a.title}</div>
+              <div class="text-[11px] opacity-80">${a.desc}</div>
+            </div>
+          </button>
+        `;
+      });
+    }
+
+    document.getElementById("sheet-backdrop").classList.remove("hidden");
+  }
+
+  function closeSheet(e) {
+    if (e.target.id === "sheet-backdrop") forceCloseSheet();
+  }
+  function forceCloseSheet() {
+    document.getElementById("sheet-backdrop").classList.add("hidden");
+  }
+
+  // ==================== ACTION HANDLERS ====================
+  function enrollUniversity() {
+    if (state.bank < 40000 && state.smarts < 85) {
+      showToast("Need $40,000 tuition (or 85%+ Smarts for scholarship)!");
+      return;
+    }
+    if (state.smarts >= 85) {
+      logEvent("🎓 Earned a full academic scholarship and graduated University with honors!", "special");
+    } else {
+      state.bank -= 40000;
+      logEvent("🎓 Paid $40,000 tuition and earned your University Degree!", "gain");
+    }
+    state.education = "uni";
+    state.smarts = clamp(state.smarts + 12);
+    forceCloseSheet();
+  }
+
+  function applyJob(jobId) {
+    const job = JOBS_DB.find(j => j.id === jobId);
+    if (!job) return;
+    if (job.reqEdu === "uni" && state.education !== "uni") {
+      showToast("Requires a University Degree!");
+      return;
+    }
+    if (state.smarts < job.reqSmarts) {
+      showToast(`Requires at least ${job.reqSmarts}% Smarts!`);
+      return;
+    }
+    state.job = job;
+    state.path = "civilian";
+    logEvent(`💼 You were hired as a ${job.title} earning ${formatMoney(job.salary)}/year!`, "gain");
+    forceCloseSheet();
+  }
+
+  function royalDuty() {
+    state.fame = clamp(state.fame + 8);
+    state.happiness = clamp(state.happiness + 6);
+    logEvent("👑 You hosted a grand royal banquet, boosting your popularity across the realm!", "special");
+    forceCloseSheet();
+  }
+
+  function promoteRoyal() {
+    if (state.fame < 80) { showToast("Need at least 80% Fame to ascend!"); return; }
+    state.royalRank += 1;
+    const r = ROYAL_RANKS[state.royalRank];
+    logEvent(`👑 Long live the ruler! You ascended to ${r.rank}!`, "special");
+    forceCloseSheet();
+  }
+
+  function mafiaExtortion() {
+    if (Math.random() < 0.22) {
+      state.inPrison = true;
+      state.prisonYears = 4;
+      logEvent("🚔 Federal agents ambushed your syndicate racket! Sentenced to 4 years in prison.", "loss");
+    } else {
+      const score = Math.floor(Math.random() * 60000) + 25000;
+      state.bank += score;
+      state.notoriety = clamp(state.notoriety + 8);
+      logEvent(`🕶️ Extorted local businesses for ${formatMoney(score)} in Syndicate protection money.`, "special");
+    }
+    forceCloseSheet();
+  }
+
+  function promoteMafia() {
+    if (state.notoriety < (state.mafiaRank + 1) * 20) {
+      showToast("Build more Notoriety before challenging for promotion!");
+      return;
+    }
+    state.mafiaRank += 1;
+    const m = MAFIA_RANKS[state.mafiaRank];
+    logEvent(`🕶️ You eliminated your rivals and rose to ${m.rank}!`, "special");
+    forceCloseSheet();
+  }
+
+  function buyAsset(id) {
+    const item = ASSETS_SHOP.find(a => a.id === id);
+    if (state.bank < item.price) { showToast("Not enough cash!"); return; }
+    state.bank -= item.price;
+    state.assets.push({ ...item });
+    state.happiness = clamp(state.happiness + (item.happiness || 0));
+    state.looks = clamp(state.looks + (item.looks || 0));
+    state.fame = clamp(state.fame + (item.fame || 0));
+    logEvent(`💎 Purchased ${item.name} for ${formatMoney(item.price)}!`, "gain");
+    forceCloseSheet();
+  }
+
+  function sellAsset(idx) {
+    const asset = state.assets[idx];
+    state.bank += asset.price;
+    state.assets.splice(idx, 1);
+    logEvent(`💰 Sold your ${asset.name} for ${formatMoney(asset.price)}.`, "gain");
+    openMenu("assets");
+  }
+
+  function findPartner(seekRoyal) {
+    if (seekRoyal && state.looks < 70 && state.fame < 40 && state.bank < 1000000) {
+      showToast("Royals require 70%+ Looks, 40%+ Fame, or $1M+ wealth!");
+      return;
+    }
+    const c = COUNTRIES[state.countryCode];
+    const pName = `${c.first[Math.floor(Math.random() * c.first.length)]} ${c.last[Math.floor(Math.random() * c.last.length)]}`;
+    state.relationships.push({
+      id: Date.now(),
+      name: seekRoyal ? `Prince/Princess ${pName.split(' ')[0]}` : pName,
+      role: seekRoyal ? "Royal Partner" : "Romantic Partner",
+      rel: 78,
+      isRoyal: seekRoyal,
+      alive: true
+    });
+    logEvent(seekRoyal ? `👑 You began a fairytale romance with Royal ${pName}!` : `💘 You started dating ${pName}!`, "special");
+    openMenu("relationships");
+  }
+
+  function interactPerson(idx, action) {
+    const p = state.relationships[idx];
+    if (action === "time") {
+      p.rel = clamp(p.rel + 12);
+      state.happiness = clamp(state.happiness + 5);
+      logEvent(`🎉 You had an amazing day out with ${p.name}.`, "gain");
+    } else if (action === "money") {
+      if (p.rel >= 60) {
+        const gift = p.isRoyal ? 50000 : Math.floor(Math.random() * 2500) + 500;
+        state.bank += gift;
+        p.rel = clamp(p.rel - 6);
+        logEvent(`💸 ${p.name} gifted you ${formatMoney(gift)}!`, "gain");
+      } else {
+        showToast(`${p.name} refused—improve your relationship first!`);
+        return;
+      }
+    } else if (action === "propose") {
+      if (p.rel >= 80) {
+        p.role = p.isRoyal ? "Royal Spouse" : "Spouse";
+        if (p.isRoyal) {
+          state.path = "royal";
+          state.royalRank = 0;
+          state.fame = clamp(state.fame + 45);
+          state.bank += 2000000;
+          logEvent(`💍👑 You married ${p.name} in a televised Royal Wedding and received $2,000,000!`, "special");
+        } else {
+          logEvent(`💍 You married ${p.name}!`, "special");
+        }
+      } else {
+        showToast("Build your relationship above 80% before proposing!");
+        return;
+      }
+    } else if (action === "baby") {
+      const c = COUNTRIES[state.countryCode];
+      const babyName = `${c.first[Math.floor(Math.random() * c.first.length)]} ${state.name.split(' ').pop()}`;
+      state.relationships.push({ id: Date.now(), name: babyName, role: "Child", rel: 100, alive: true });
+      state.happiness = clamp(state.happiness + 15);
+      logEvent(`👶 You welcomed a newborn child named ${babyName} into the world!`, "special");
+    }
+    openMenu("relationships");
+  }
+
+  function doActivity(type) {
+    forceCloseSheet();
+    if (type === "gym") {
+      if (state.bank < 500) { showToast("Need $500 for gym membership!"); return; }
+      state.bank -= 500;
+      state.health = clamp(state.health + 7);
+      state.looks = clamp(state.looks + 5);
+      logEvent("🏋️ Crushed an intense workout session (+Health, +Looks).", "gain");
+    } else if (type === "study") {
+      state.smarts = clamp(state.smarts + 6);
+      logEvent("📚 Spent hours reading and sharpening your mind (+Smarts).", "gain");
+    } else if (type === "casino") {
+      if (state.bank < 5000) { showToast("Need $5,000 to enter the high-stakes room!"); return; }
+      if (Math.random() < 0.48) {
+        state.bank += 10000;
+        state.happiness = clamp(state.happiness + 10);
+        logEvent("🎰 Jackpot at the VIP Blackjack table! Won $10,000!", "gain");
+      } else {
+        state.bank -= 5000;
+        state.happiness = clamp(state.happiness - 8);
+        logEvent("🎰 Lost $5,000 at the casino tables.", "loss");
+      }
+    } else if (type === "fame") {
+      state.fame = clamp(state.fame + 9);
+      const rev = state.fame * 250;
+      state.bank += rev;
+      logEvent(`📱 Your latest post trended globally (+Fame, +${formatMoney(rev)} ad revenue)!`, "special");
+    } else if (type === "heist") {
+      const successChance = 0.25 + (state.smarts / 250);
+      if (Math.random() < successChance) {
+        const loot = Math.floor(Math.random() * 350000) + 150000;
+        state.bank += loot;
+        state.notoriety = clamp(state.notoriety + 25);
+        state.karma = clamp(state.karma - 20);
+        logEvent(`🎭 Flawless vault heist! Escaped with ${formatMoney(loot)}!`, "special");
+      } else {
+        state.inPrison = true;
+        state.prisonYears = 6;
+        state.notoriety = clamp(state.notoriety + 15);
+        logEvent("🚨 Alarms tripped during the bank heist! Sentenced to 6 years in maximum security.", "loss");
+      }
+    } else if (type === "emigrate") {
+      if (state.bank < 10000) { showToast("Need $10,000 for international relocation!"); return; }
+      const keys = Object.keys(COUNTRIES).filter(k => k !== state.countryCode);
+      const nextCode = keys[Math.floor(Math.random() * keys.length)];
+      state.bank -= 10000;
+      state.countryCode = nextCode;
+      state.countryName = COUNTRIES[nextCode].name;
+      state.flag = COUNTRIES[nextCode].flag;
+      logEvent(`✈️ Emigrated to ${state.countryName} ${state.flag} for a brand new chapter!`, "special");
+    }
+  }
+
+  // ==================== FATE WEAVER (CUSTOM ACTION ENGINE) ====================
+  function openCustomModal() {
+    document.getElementById("custom-action-input").value = "";
+    document.getElementById("custom-modal").classList.remove("hidden");
+  }
+  function closeCustomModal() {
+    document.getElementById("custom-modal").classList.add("hidden");
+  }
+  function fillCustomPrompt(txt) {
+    document.getElementById("custom-action-input").value = txt;
+  }
+
+  async function executeCustomAction() {
+    const prompt = document.getElementById("custom-action-input").value.trim();
+    if (!prompt) { showToast("Type an action first!"); return; }
+
+    const btn = document.getElementById("custom-submit-btn");
+    btn.textContent = "⏳ Weaving Destiny...";
+    btn.disabled = true;
+
+    const savedKey = localStorage.getItem("lifeforge_opt_key") || "";
+
+    // Optional LLM path ONLY if user voluntarily entered a free key
+    if (savedKey.startsWith("gsk_")) {
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${savedKey}` },
+          body: JSON.stringify({
+            model: "llama-3.1-8b-instant",
+            messages: [
+              { role: "system", content: "You are a BitLife game engine. Return ONLY JSON: {\"outcome\":\"2 sentence dramatic story\",\"bankDelta\":number,\"happinessDelta\":number,\"healthDelta\":number,\"smartsDelta\":number,\"fameDelta\":number,\"notorietyDelta\":number}" },
+              { role: "user", content: `Character: ${state.name}, Age ${state.age}, Bank $${state.bank}, Role: ${getRoleLabel()}. Action: ${prompt}` }
+            ],
+            temperature: 0.8
+          })
+        });
+        const data = await res.json();
+        const parsed = JSON.parse(data.choices[0].message.content);
+        state.bank += (parsed.bankDelta || 0);
+        state.happiness = clamp(state.happiness + (parsed.happinessDelta || 5));
+        state.health = clamp(state.health + (parsed.healthDelta || 0));
+        state.smarts = clamp(state.smarts + (parsed.smartsDelta || 0));
+        state.fame = clamp(state.fame + (parsed.fameDelta || 0));
+        state.notoriety = clamp(state.notoriety + (parsed.notorietyDelta || 0));
+        closeCustomModal();
+        logEvent(`🔮 ${parsed.outcome}`, "special");
+        btn.textContent = "✨ Execute Action";
+        btn.disabled = false;
+        return;
+      } catch (err) {
+        // Silently fall back to offline engine
+      }
+    }
+
+    // 100% Offline Smart Intent & Fate Engine (Instant, Zero Keys)
+    const lower = prompt.toLowerCase();
+    const powerScore = (state.smarts + state.looks + state.happiness) / 3 + (state.bank > 100000 ? 15 : 0);
+    const success = (Math.random() * 100) < Math.max(35, Math.min(88, powerScore));
+
+    let msg = "";
+    let type = "special";
+
+    if (lower.includes("royal") || lower.includes("king") || lower.includes("queen") || lower.includes("prince") || lower.includes("throne")) {
+      if (success) {
+        state.path = "royal";
+        state.royalRank = Math.max(0, state.royalRank);
+        state.fame = clamp(state.fame + 35);
+        state.bank += 1500000;
+        msg = `👑 Bold move! Your audacity captivated the palace court—you claimed a Royal title and $1,500,000!`;
+      } else {
+        state.happiness = clamp(state.happiness - 10);
+        msg = `👑 Palace guards escorted you off the royal grounds before your plan succeeded.`;
+        type = "loss";
+      }
+    } else if (lower.includes("mafia") || lower.includes("heist") || lower.includes("crime") || lower.includes("cartel") || lower.includes("gang") || lower.includes("steal") || lower.includes("racing")) {
+      if (success) {
+        const cash = Math.floor(Math.random() * 250000) + 50000;
+        state.path = "mafia";
+        state.mafiaRank = Math.max(0, state.mafiaRank);
+        state.bank += cash;
+        state.notoriety = clamp(state.notoriety + 22);
+        msg = `🕶️ You executed "${prompt}" with ruthless precision, netting ${formatMoney(cash)} and underworld legend status!`;
+      } else {
+        state.inPrison = true;
+        state.prisonYears = 3;
+        state.notoriety = clamp(state.notoriety + 15);
+        msg = `🚔 Your operation ("${prompt}") was busted in a sting! Sentenced to 3 years in prison.`;
+        type = "loss";
+      }
+    } else if (lower.includes("startup") || lower.includes("company") || lower.includes("business") || lower.includes("billion") || lower.includes("invest") || lower.includes("tech")) {
+      if (success) {
+        const payout = Math.floor(Math.random() * 800000) + 120000;
+        state.bank += payout;
+        state.fame = clamp(state.fame + 15);
+        state.smarts = clamp(state.smarts + 5);
+        msg = `🚀 Your venture ("${prompt}") became an overnight sensation, generating ${formatMoney(payout)} in profit!`;
+      } else {
+        const loss = Math.min(state.bank, 15000);
+        state.bank -= loss;
+        msg = `📉 "${prompt}" ran into fierce market competition and lost ${formatMoney(loss)}.`;
+        type = "loss";
+      }
+    } else {
+      if (success) {
+        const reward = Math.floor(Math.random() * 45000) + 5000;
+        state.bank += reward;
+        state.happiness = clamp(state.happiness + 14);
+        state.fame = clamp(state.fame + 10);
+        msg = `✨ You went all-in on "${prompt}"—and pulled it off! Earned ${formatMoney(reward)} and massive respect.`;
+      } else {
+        state.happiness = clamp(state.happiness - 8);
+        msg = `🎲 You attempted "${prompt}", but things didn't go quite as planned.`;
+        type = "loss";
+      }
+    }
+
+    btn.textContent = "✨ Execute Action";
+    btn.disabled = false;
+    closeCustomModal();
+    logEvent(msg, type);
+  }
+
+  // ==================== GOD MODE, SETTINGS & DEATH ====================
+  function openGodModeModal() {
+    document.getElementById("gm-name").value = state.name;
+    document.getElementById("gm-bank").value = state.bank;
+    document.getElementById("gm-hap").value = state.happiness;
+    document.getElementById("gm-lbl-hap").textContent = state.happiness;
+    document.getElementById("gm-hea").value = state.health;
+    document.getElementById("gm-lbl-hea").textContent = state.health;
+    document.getElementById("gm-sma").value = state.smarts;
+    document.getElementById("gm-lbl-sma").textContent = state.smarts;
+    document.getElementById("gm-loo").value = state.looks;
+    document.getElementById("gm-lbl-loo").textContent = state.looks;
+    document.getElementById("gm-fam").value = state.fame;
+    document.getElementById("gm-lbl-fam").textContent = state.fame;
+    document.getElementById("gm-not").value = state.notoriety;
+    document.getElementById("gm-lbl-not").textContent = state.notoriety;
+    document.getElementById("god-modal").classList.remove("hidden");
+  }
+  function closeGodModeModal() {
+    document.getElementById("god-modal").classList.add("hidden");
+  }
+
+  function maxAllStats() {
+    ["hap", "hea", "sma", "loo", "fam"].forEach(k => {
+      document.getElementById(`gm-${k}`).value = 100;
+      document.getElementById(`gm-lbl-${k}`).textContent = 100;
+    });
+  }
+
+  function applyGodModeEdits() {
+    const newName = document.getElementById("gm-name").value.trim();
+    if (newName) state.name = newName;
+    state.bank = Number(document.getElementById("gm-bank").value) || 0;
+    state.happiness = clamp(Number(document.getElementById("gm-hap").value));
+    state.health = clamp(Number(document.getElementById("gm-hea").value));
+    state.smarts = clamp(Number(document.getElementById("gm-sma").value));
+    state.looks = clamp(Number(document.getElementById("gm-loo").value));
+    state.fame = clamp(Number(document.getElementById("gm-fam").value));
+    state.notoriety = clamp(Number(document.getElementById("gm-not").value));
+    closeGodModeModal();
+    renderAll();
+    showToast("⚡ God Mode changes applied!");
+  }
+
+  function startCustomNewLife() {
+    const name = document.getElementById("new-name").value;
+    const country = document.getElementById("new-country").value;
+    const origin = document.getElementById("new-origin").value;
+    state = createInitialState({ name, country, origin });
+    closeGodModeModal();
+    document.getElementById("tombstone-modal").classList.add("hidden");
+    renderAll();
+    showToast("👶 New life started!");
+  }
+
+  function openSettingsModal() {
+    document.getElementById("opt-api-key").value = localStorage.getItem("lifeforge_opt_key") || "";
+    document.getElementById("settings-modal").classList.remove("hidden");
+  }
+  function closeSettingsModal() {
+    document.getElementById("settings-modal").classList.add("hidden");
+  }
+  function saveOptionalKey() {
+    const k = document.getElementById("opt-api-key").value.trim();
+    localStorage.setItem("lifeforge_opt_key", k);
+    closeSettingsModal();
+    showToast(k ? "Optional AI Key saved!" : "Key cleared (Offline mode active)");
+  }
+
+  function confirmSurrender() {
+    closeSettingsModal();
+    triggerDeath("You chose to conclude your story and rest.");
+  }
+
+  function triggerDeath(reason) {
+    state.alive = false;
+    logEvent(`🪦 ${reason}`, "loss");
+    openTombstone();
+  }
+
+  function openTombstone() {
+    let ribbon = "Model Citizen";
+    if (state.path === "royal") ribbon = "👑 Sovereign Monarch";
+    else if (state.path === "mafia") ribbon = "🕶️ Crime Lord";
+    else if (state.bank >= 1000000000) ribbon = "💎 Billionaire Mogul";
+    else if (state.bank >= 1000000) ribbon = "💰 Multimillionaire";
+    else if (state.fame >= 70) ribbon = "🌟 Global Icon";
+    else if (state.notoriety >= 60) ribbon = "⛓️ Infamous Outlaw";
+
+    document.getElementById("tomb-ribbon").textContent = ribbon;
+    document.getElementById("tomb-name").textContent = state.name;
+    document.getElementById("tomb-years").textContent = `Died at Age ${state.age} • ${state.countryName} ${state.flag}`;
+    document.getElementById("tomb-worth").textContent = formatMoney(state.bank);
+    document.getElementById("tomb-title").textContent = getRoleLabel();
+    document.getElementById("tomb-karma").textContent = state.karma >= 60 ? "Saintly" : (state.karma <= 35 ? "Ruthless" : "Balanced");
+
+    const child = state.relationships.find(r => r.role === "Child" && r.alive);
+    const childBtn = document.getElementById("btn-continue-child");
+    if (child) {
+      childBtn.classList.remove("hidden");
+      childBtn.textContent = `👶 Play as ${child.name.split(' ')[0]}`;
+    } else {
+      childBtn.classList.add("hidden");
+    }
+
+    document.getElementById("tombstone-modal").classList.remove("hidden");
+  }
+
+  function continueAsChild() {
+    const child = state.relationships.find(r => r.role === "Child" && r.alive);
+    if (!child) return;
+    const inheritedBank = Math.max(0, state.bank);
+    const cCode = state.countryCode;
+    state = createInitialState({ name: child.name, country: cCode, origin: "normal" });
+    state.bank = inheritedBank;
+    state.journal = [{
+      age: 0,
+      entries: [{ text: `You inherited ${formatMoney(inheritedBank)} from your late parent and began your own legacy in ${state.countryName} ${state.flag}!`, type: "special" }]
+    }];
+    document.getElementById("tombstone-modal").classList.add("hidden");
+    renderAll();
+    showToast(`Continuing legacy as ${state.name}!`);
+  }
+
+  // ==================== BOOT APP ====================
+  window.onload = function () {
+    if (!loadState()) {
+      state = createInitialState();
+    }
+    renderAll();
+  };
+</script>
+</body>
+</html>
